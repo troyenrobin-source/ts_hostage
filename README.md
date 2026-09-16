@@ -327,6 +327,7 @@ Test na installatie of bijwerken:
 - [ox_target API](https://github.com/overextended/ox_target/blob/main/client/api.lua)
 - [Discord-webhooks](https://docs.discord.com/developers/resources/webhook)
 - [ox_lib-notificaties](https://overextended.dev/docs/ox_lib/Interface/Client/notify)
+- [troy's Gamecommunity](https://discord.gg/nTzVy5uMWX)
 
 ---
 
