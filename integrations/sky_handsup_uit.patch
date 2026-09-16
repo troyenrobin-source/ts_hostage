@@ -1,0 +1,11 @@
+--- sky_jobs_base/config/config.lua
++++ sky_jobs_base/config/config.lua
+@@ -1115,7 +1115,7 @@
+         }
+     },
+     handsUp = {
+-        enabled = true,
++        enabled = false,
+         key = "H",
+         holdSeconds = 3
+     },
