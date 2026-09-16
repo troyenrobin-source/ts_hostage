@@ -213,4 +213,4 @@ AddEventHandler('onResourceStop', function(name)
     for _, s in pairs(sessions) do remove[#remove + 1] = s end
     for _, s in ipairs(remove) do finish(s, false, 'automatic', 'Servercontrole of resource gestopt') end
 end)
-print('^5[TroyScripts]^7 ts_hostage 1.1.3 gestart')
+print(('^5[TroyScripts]^7 ts_hostage %s gestart'):format(GetResourceMetadata(GetCurrentResourceName(), 'version', 0) or 'onbekend'))

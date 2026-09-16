@@ -1,3 +1,15 @@
+## 1.1.5 — Versie-update en openbare GitHub-repository
+- Versie in fxmanifest.lua en version.json verhoogd naar 1.1.5.
+- Repository is openbaar bereikbaar; standaardbranch main bevestigd.
+- Updatepakket bevat de updatecontrole uit 1.1.4, zodat installeren over 1.1.3 mogelijk is.
+- version.json moet bij publicatie in de hoofdmap op GitHub worden geplaatst.
+
+## 1.1.4 — GitHub-updatecontrole
+- Controleert bij iedere resourcestart de publieke version.json op GitHub.
+- Vergelijkt versienummers numeriek en toont status of downloadlink in de console.
+- Netwerkfouten, ontbrekende bestanden en ongeldige versies stoppen het script niet.
+- Opstartbericht leest de versie uit fxmanifest.lua.
+
 ## 1.1.3 — Politiemelding herstellen
 - ox_lib expliciet geïnitialiseerd; client gebruikt direct lib.notify.
 - Oud configuratiebestand zonder politieblok krijgt veilige police-standaardwaarden.
