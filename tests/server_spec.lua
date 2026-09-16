@@ -38,10 +38,23 @@ exports = { es_extended = { getSharedObject = function()
   return { getJob = function() return { name = id == 3 and 'police' or 'unemployed' } end }
  end }
 end } }
+
+-- Simuleert de resource-exportgrens; de echte bridgecode wordt uitgevoerd.
+local bridgeExports = {}
+exports.ts_bridge = setmetatable({}, { __index = function(_, name)
+    return function(_, ...) return assert(bridgeExports[name], name)(...) end
+end })
+setmetatable(exports, { __call = function(_, name, fn) bridgeExports[name] = fn end })
+function GetInvokingResource() return 'ts_hostage' end
+
+function GetResourceMetadata() return '1.1.6' end
+dofile('../ts_bridge/config.lua')
+dofile('../ts_bridge/server_config.lua')
+dofile('../ts_bridge/server/main.lua')
 local function alerts()
  local n = 0
  for _, e in ipairs(emitted) do
-  if e[1] == 'ts_hostage:policeAlert' then
+  if e[1] == 'ts_bridge:jobAlert' then
    assert(e[2] == 3, 'only police may receive alerts')
    assert(e[4].x == 120 and e[4].y == 240 and e[4].z == 30, 'server location included')
    assert(e[3].duration == 10000 and e[3].type == 'warning')
@@ -91,3 +104,10 @@ exports.es_extended.getSharedObject = function()
 end
 commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 1, 'job fallback and per-player isolation')
 print('PASS: old config, console-only diagnostics, disabled alerts, job fallback, player isolation')
+emitted = {}; TSBridgeServer.Framework = 'standalone'
+commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 0, 'standalone cannot invent jobs')
+TSBridgeServer.Framework = 'esx'
+GetResourceState = function() return 'stopped' end
+commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 0, 'missing ESX')
+assert(exports.ts_bridge:AlertJobs({police=true}, {}, {x=0/0,y=0,z=0}, 60) == 0, 'invalid coords')
+print('PASS: standalone, missing ESX, invalid coordinates')

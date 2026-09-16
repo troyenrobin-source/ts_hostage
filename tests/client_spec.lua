@@ -29,7 +29,7 @@ function RegisterKeyMapping() end
 function RegisterNetEvent() end
 function AddEventHandler() end
 function TriggerServerEvent(...) requests[#requests+1] = {...} end
-exports = setmetatable({}, { __call = function() end })
+exports = setmetatable({ ts_bridge = { GetTargetResource = function() return 'ox_target' end } }, { __call = function() end })
 Bridge = { IsDead = function() return false end, Notify = function(s) notices[#notices+1] = s end,
  VehicleFirstPerson = function() return camera == 4 end }
 dofile('config.lua'); dofile('client.lua')

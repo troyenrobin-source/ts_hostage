@@ -295,14 +295,15 @@ CreateThread(function()
 end)
 
 local targetRegistered = false
+local targetResource = exports['ts_bridge']:GetTargetResource()
 local function registerTarget()
-    if Config.Interaction == 'key' or targetRegistered or GetResourceState('ox_target') ~= 'started' then return end
-    exports.ox_target:addGlobalPlayer({ {
+    if Config.Interaction == 'key' or targetRegistered or GetResourceState(targetResource) ~= 'started' then return end
+    exports['ts_bridge']:AddGlobalPlayer({ {
         name = 'ts_hostage_player', label = 'Gijzelen (handen omhoog vereist)', icon = 'fas fa-person-rifle', distance = Config.Distance,
         canInteract = function(entity) return canTake(entity) end,
         onSelect = function(data) request(data.entity) end
     } })
-    exports.ox_target:addGlobalVehicle({ {
+    exports['ts_bridge']:AddGlobalVehicle({ {
         name = 'ts_hostage_vehicle', label = 'Inzittende gijzelen (first person)', icon = 'fas fa-person-rifle', distance = Config.Distance,
         canInteract = function(entity) return closest(entity) ~= nil end,
         onSelect = function(data) request(closest(data.entity)) end
@@ -322,13 +323,10 @@ CreateThread(function()
     end
 
 end)
-AddEventHandler('onClientResourceStart', function(name) if name == 'ox_target' then registerTarget() end end)
+AddEventHandler('onClientResourceStart', function(name) if name == targetResource then registerTarget() end end)
 AddEventHandler('onClientResourceStop', function(name)
-    if name == 'ox_target' then targetRegistered = false end
+    if name == targetResource then targetRegistered = false end
     if name ~= GetCurrentResourceName() then return end
     cleanup()
-    if targetRegistered and GetResourceState('ox_target') == 'started' then
-        exports.ox_target:removeGlobalPlayer('ts_hostage_player')
-        exports.ox_target:removeGlobalVehicle('ts_hostage_vehicle')
-    end
+
 end)

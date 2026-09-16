@@ -5,61 +5,26 @@ for name, kind in pairs(Config.Weapons) do weaponTypes[HostageWeaponHash(GetHash
 
 local function notify(id, msg) TriggerClientEvent('ts_hostage:notify', id, msg) end
 
--- Defaults houden oudere server_config.lua-bestanden met eigen webhooks bruikbaar.
+-- De gevalideerde sessie bepaalt de locatie; de bridge controleert de jobs.
 local function notifyPolice(session)
     local cfg = PoliceAlertConfig or { Enabled = true, Jobs = { police = true } }
-    if cfg.Enabled == false then
-        print('^3[TroyScripts]^7 Politiemelding uitgeschakeld in PoliceAlertConfig.')
-        return
-    end
-    if GetResourceState('es_extended') ~= 'started' or GetResourceState('ox_lib') ~= 'started' then
-        print('^3[TroyScripts]^7 Politiemelding overgeslagen: es_extended en ox_lib moeten gestart zijn.')
-        return
-    end
-    local ok, err = pcall(function()
+    if cfg.Enabled == false then return end
+    local ok, result = pcall(function()
         local ped = GetPlayerPed(session.captor)
-        if ped == 0 then error('Speler voor meldingslocatie is niet online.') end
+        if ped == 0 then return 0 end
         local coords = GetEntityCoords(ped)
-        local location = { x = coords.x, y = coords.y, z = coords.z }
-        local ESX = exports['es_extended']:getSharedObject()
-        local jobs, recipients, found = cfg.Jobs or { police = true }, 0, {}
-        for _, playerId in ipairs(GetPlayers()) do
-            local id = tonumber(playerId)
-            -- Een ongeldige speler mag meldingen aan andere agenten niet blokkeren.
-            local playerOk, playerErr = pcall(function()
-                local player = id and id > 0 and ESX.GetPlayerFromId(id)
-                if not player then return end
-                local job = type(player.getJob) == 'function' and player.getJob() or player.job
-                local name = type(job) == 'table' and job.name or job
-                if type(name) ~= 'string' then return end
-                found[name] = (found[name] or 0) + 1
-                if jobs[name] ~= true then return end
-                TriggerClientEvent('ts_hostage:policeAlert', id, {
-                    title = cfg.Title or 'Politiemelding',
-                    description = cfg.Description or 'Er is een gijzeling gaande! Een persoon wordt gegijzeld.',
-                    duration = cfg.Duration or 10000,
-                    position = cfg.Position or 'top-right',
-                    type = 'warning',
-                    icon = 'shield-halved'
-                }, location, cfg.WaypointSeconds or 60)
-                recipients = recipients + 1
-            end)
-            if not playerOk then
-                print(('^1[TroyScripts]^7 Politiejob controleren mislukt voor ID %s: %s'):format(tostring(id), tostring(playerErr)))
-            end
-        end
-        print(('^5[TroyScripts]^7 Politiemelding verstuurd naar %d agent(en).'):format(recipients))
-        if recipients == 0 then
-            local names = {}
-            for name, count in pairs(found) do names[#names + 1] = name .. '=' .. count end
-            table.sort(names)
-            print('^3[TroyScripts]^7 Geen passende politiejob gevonden. Online jobs: ' .. table.concat(names, ', ')
-                .. '. Controleer PoliceAlertConfig.Jobs in server_config.lua.')
-        end
+        return exports['ts_bridge']:AlertJobs(cfg.Jobs or { police = true }, {
+            title = cfg.Title or 'Politiemelding',
+            description = cfg.Description or 'Er is een gijzeling gaande! Een persoon wordt gegijzeld.',
+            duration = cfg.Duration or 10000,
+            position = cfg.Position or 'top-right',
+            type = 'warning', icon = 'shield-halved'
+        }, { x = coords.x, y = coords.y, z = coords.z }, cfg.WaypointSeconds or 60)
     end)
-    if not ok then
-        print(('^1[TroyScripts]^7 Politiemelding mislukt: %s'):format(tostring(err)))
-    end
+    if ok then
+        print(('[Troy Scripts] Politiemelding verstuurd naar %d agent(en).'):format(result or 0))
+        if result == 0 then print('[Troy Scripts] Controleer ts_bridge_check en PoliceAlertConfig.Jobs.') end
+    else print('^1[Troy Scripts] Politiemelding via ts_bridge mislukt.^7') end
 end
 
 -- Alleen serverconsole: test dezelfde ontvangers en clientmelding zonder gijzeling.

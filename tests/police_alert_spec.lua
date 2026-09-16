@@ -10,12 +10,12 @@ function GetNameOfZone() return 'CITY' end
 function GetLabelText() return 'Centrum' end
 lib = { notify = function(data) shown = data end }
 function SetNewWaypoint(x, y) waypoint = { x, y } end
-dofile('police_alert.lua')
+dofile('../ts_bridge/config.lua'); dofile('../ts_bridge/client/alerts.lua')
 command(); assert(not waypoint)
 source = 65535
 event({ description = 'Gijzeling' }, { x=120, y=240, z=30 }, 60)
 assert(shown.description:find('Main Street / Cross Street (Centrum)', 1, true))
-assert(shown.description:find('Druk op G', 1, true))
+assert(shown.description:find('standaard G', 1, true))
 command(); assert(waypoint[1] == 120 and waypoint[2] == 240)
 waypoint = nil; command(); assert(not waypoint, 'consumed waypoint')
 event({}, { x=10, y=20, z=30 }, 60)

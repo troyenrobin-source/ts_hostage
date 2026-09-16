@@ -1,15 +1,11 @@
 Bridge = {}
 
 function Bridge.Notify(message)
-    BeginTextCommandThefeedPost('STRING')
-    AddTextComponentSubstringPlayerName(message)
-    EndTextCommandThefeedPostTicker(false, false)
+    return exports['ts_bridge']:Notify(message)
 end
 
 function Bridge.IsDead(ped)
-    local s = LocalPlayer.state
-    return IsEntityDead(ped) or IsPedFatallyInjured(ped)
-        or s.dead == true or s.isDead == true or s.laststand == true
+    return exports['ts_bridge']:IsDead(ped)
 end
 
 function Bridge.HandsUp(ped)

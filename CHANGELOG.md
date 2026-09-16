@@ -1,3 +1,13 @@
+# Wijziging 1.1.6 — ts_bridge-integratie
+
+- Verplichte dependency op ts_bridge 0.0.1(BETA).
+- Meldingen, doodstatus, ESX-jobcontrole, targetkoppeling en waypoint naar de bridge.
+- Discord-transport, screenshotafhandeling en limieten centraal in ts_bridge.
+- Bestaande server-side webhook-URL's en PoliceAlertConfig blijven bruikbaar.
+- Gijzelingslogica, animaties, H/E/X en bestaande updatecontrole behouden.
+- Handleiding, manifest en version.json bijgewerkt; integratietests aangepast.
+- Niet live getest op een FiveM-server.
+
 ## 1.1.5 — Versie-update en openbare GitHub-repository
 - Versie in fxmanifest.lua en version.json verhoogd naar 1.1.5.
 - Repository is openbaar bereikbaar; standaardbranch main bevestigd.

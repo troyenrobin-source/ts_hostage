@@ -6,9 +6,7 @@ WebhookConfig = {
     Username = 'TroyScripts | Gijzelingen',
     AvatarUrl = '', -- optioneel: openbare https-link naar je logo
     Screenshots = true, -- vereist screenshot-basic; anders wordt alleen tekst verstuurd
-    ScreenshotTimeoutMs = 8000,
-    MaxImageBytes = 4 * 1024 * 1024,
-    MaxQueue = 32,
+    -- Timeout, afbeeldingslimiet en wachtrij staan nu in ts_bridge/server_config.lua.
     LogAutomaticRelease = true,
     -- Platformnaam + server-ID worden standaard gelogd.
     -- Voor een RP-naam: vul hier je eigen server-side frameworkkoppeling in.

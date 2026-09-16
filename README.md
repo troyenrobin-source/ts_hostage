@@ -1,6 +1,6 @@
 # TroyScripts — ts_hostage
 
-**Versie 1.1.3** · FiveM · Gijzelingen te voet en in voertuigen
+**Versie 1.1.6** (vereist ts_bridge 0.0.1(BETA)) · FiveM · Gijzelingen te voet en in voertuigen
 
 Met `ts_hostage` kunnen spelers een andere speler gijzelen, loslaten of omleggen.
 De resource bevat een eigen handen-omhoog-functie, politiemeldingen met locatie
@@ -9,12 +9,19 @@ en een optioneel waypoint, plus Discord-logging met optionele screenshots.
 De huidige mespositie is behouden. De hand sluit nog niet anatomisch correct
 om het handvat; dit is een bekende beperking van deze versie.
 
+## Nieuw: centrale bridge
+
+Meldingen, ESX-jobcontrole, targetregistratie, webhooktransport en screenshots lopen
+nu via ts_bridge. Lees **UPDATE-INSTALLATIE.md** voor de migratie en centrale instellingen.
+De bestaande GitHub-updatecontrole blijft behouden.
+
 ## Vereisten
 
 | Onderdeel | Gebruik |
 | --- | --- |
 | FiveM met OneSync | Synchronisatie van spelers en gijzelingen. |
-| `ox_lib` | Politiemeldingen. |
+| `ts_bridge` 0.0.1(BETA) | Centrale koppelingen; verplicht. |
+| `ox_lib` | Meldingen via ts_bridge. |
 | `es_extended` (ESX) | Politieagenten herkennen voor de politiemeldingen. |
 | `ox_target` | Vereist bij `Config.Interaction = 'target'` of `'both'`. |
 | `screenshot-basic` | Optioneel, voor foto's in Discord-logs. |
@@ -26,7 +33,7 @@ is bij deze herschrijving niet geverifieerd.
 
 ## Installatie
 
-1. Plaats de map `ts_hostage` in bijvoorbeeld `resources/[troyscripts]`.
+1. Plaats eerst `ts_bridge` zoals beschreven in UPDATE-INSTALLATIE.md. Plaats daarna de map `ts_hostage` in bijvoorbeeld `resources/[troyscripts]`.
 2. Stel `config.lua` en `server_config.lua` in.
 3. Voeg onderstaande regels toe aan `server.cfg`. Voeg bestaande startregels niet dubbel toe.
 
@@ -40,13 +47,14 @@ ensure ox_target
 # Alleen nodig voor screenshots in Discord-logs:
 ensure screenshot-basic
 
+ensure ts_bridge
 ensure ts_hostage
 ```
 
 Controleer na het starten de console. Voor deze versie hoort de opstartmelding
-versie **1.1.3** te vermelden.
+versie **1.1.6** te vermelden.
 
-## Bijwerken naar 1.1.3
+## Bijwerken naar 1.1.6
 
 1. Maak een backup van de bestaande resource, inclusief je configuratie.
 2. Stop de resource met `stop ts_hostage`.
@@ -249,7 +257,7 @@ broncodemap zo nodig naar `ts_hostage` voordat je deze op de server plaatst.
 
 ### Updatecontrole
 
-Vanaf versie **1.1.3** is een GitHub-updatecontrole toegevoegd. Bij het starten
+Vanaf versie **1.1.6** is een GitHub-updatecontrole toegevoegd. Bij het starten
 controleert de resource of een nieuwere versie beschikbaar is. Wanneer dat zo is,
 verschijnt een melding in de serverconsole met een GitHub-link om de update op te halen.
 
@@ -259,15 +267,15 @@ in de updatecontrole van je geïnstalleerde script. Alleen een wijziging in deze
 README past de controle-URL in de code niet aan.
 
 De controle installeert de update niet automatisch. Maak een backup en volg
-[Bijwerken naar 1.1.3](#bijwerken-naar-113) om een nieuwe versie handmatig te installeren.
+[Bijwerken naar 1.1.6](#bijwerken-naar-113) om een nieuwe versie handmatig te installeren.
 
 ## Changelog
 
-### 1.1.3 — GitHub-updatecontrole
+### 1.1.6 — GitHub-updatecontrole
 
 - GitHub-updatecontrole toegevoegd.
 - Melding met GitHub-link wanneer een nieuwere versie beschikbaar is.
-- Handleiding bijgewerkt naar versie 1.1.3 en repository `troyscripts/ts_hostage`.
+- Handleiding bijgewerkt naar versie 1.1.6 en repository `troyscripts/ts_hostage`.
 - Bestaande functies en bekende beperkingen blijven beschreven zoals in 1.1.2.
 
 ### 1.1.2 — Locatie en waypoint
@@ -299,7 +307,7 @@ De controle installeert de update niet automatisch. Maak een backup en volg
 Gijzelen te voet en in voertuigen is eerder door de gebruiker als werkend gemeld.
 De eerdere documentatie vermeldt Lua-syntaxcontroles en tests met gesimuleerde
 FiveM-functies voor versie 1.1.0. Die resultaten zijn geen volledige validatie
-van versie 1.1.3, live animaties of daadwerkelijke Discord-bezorging.
+van versie 1.1.6, live animaties of daadwerkelijke Discord-bezorging.
 
 Test na installatie of bijwerken:
 
