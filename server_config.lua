@@ -3,7 +3,7 @@ WebhookConfig = {
     Enabled = true,
     Start = '',   -- Discord-webhook: gijzeling gestart
     Actions = '', -- andere Discord-webhook: loslaten / omleggen / afgebroken
-    Username = 'TroyScripts | Gijzelingen',
+    Username = TSL('server_config_troyscripts_gijzelingen'),
     AvatarUrl = '', -- optioneel: openbare https-link naar je logo
     Screenshots = true, -- vereist screenshot-basic; anders wordt alleen tekst verstuurd
     -- Timeout, afbeeldingslimiet en wachtrij staan nu in ts_bridge/server_config.lua.
@@ -11,7 +11,7 @@ WebhookConfig = {
     -- Platformnaam + server-ID worden standaard gelogd.
     -- Voor een RP-naam: vul hier je eigen server-side frameworkkoppeling in.
     PlayerName = function(playerId)
-        return GetPlayerName(playerId) or ('Speler ' .. tostring(playerId))
+        return GetPlayerName(playerId) or (TSL('server_config_speler') .. tostring(playerId))
     end
 }
 
@@ -20,8 +20,8 @@ WebhookConfig = {
 PoliceAlertConfig = {
     Enabled = true,
     Jobs = { police = true },
-    Title = 'Politiemelding',
-    Description = 'Er is een gijzeling gaande! Een persoon wordt gegijzeld.',
+    Title = TSL('server_politiemelding'),
+    Description = TSL('server_er_is_een_gijzeling_gaande_een_persoon'),
     Duration = 10000,
     WaypointSeconds = 60, -- tijd om met G een route naar de laatste melding te zetten
     Position = 'top-right'

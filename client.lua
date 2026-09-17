@@ -1,3 +1,4 @@
+if not TSBridgeGuard.Await() then return end
 local session, offered = nil, nil
 local nextRequest, actionAt = 0, 0
 local weapons = {}
@@ -30,32 +31,32 @@ exports('GetRole', function() return session and session.role or (offered and 'p
 local function vehicleAllowed(a, b)
     local va, vb = GetVehiclePedIsIn(a, false), GetVehiclePedIsIn(b, false)
     if va == 0 and vb == 0 then return true, false end
-    if not Config.Vehicle.Enabled then return false, false, 'Gijzelen in voertuigen is uitgeschakeld.' end
-    if va == 0 or va ~= vb then return false, false, 'Jullie moeten beiden te voet zijn, of in dezelfde auto zitten.' end
-    if GetEntitySpeed(va) > Config.Vehicle.MaxStartSpeed then return false, false, 'De auto moet bij het vastpakken stilstaan.' end
+    if not Config.Vehicle.Enabled then return false, false, TSL('client_gijzelen_in_voertuigen_is_uitgeschakeld') end
+    if va == 0 or va ~= vb then return false, false, TSL('client_jullie_moeten_beiden_te_voet_zijn_of') end
+    if GetEntitySpeed(va) > Config.Vehicle.MaxStartSpeed then return false, false, TSL('client_de_auto_moet_bij_het_vastpakken_stilstaan') end
     for _, pair in ipairs(Config.Vehicle.SeatPairs) do
         if GetPedInVehicleSeat(va, pair.captor) == a and GetPedInVehicleSeat(va, pair.victim) == b then return true, true end
     end
-    return false, false, 'Ga als bijrijder naast het slachtoffer op de bestuurdersstoel zitten.'
+    return false, false, TSL('client_ga_als_bijrijder_naast_het_slachtoffer_op')
 end
 local function canTake(ped)
     local me = PlayerPedId()
-    if busy() then return false, 'Je bent al bezig met een gijzeling.' end
-    if not ped or ped == me or ped == 0 or not IsPedAPlayer(ped) then return false, 'Geen andere speler dichtbij. NPCs worden niet ondersteund.' end
-    if Bridge.IsDead(me) then return false, 'Je personage staat als dood of zwaargewond geregistreerd.' end
-    if IsEntityDead(ped) then return false, 'Het slachtoffer is dood.' end
-    if IsPedRagdoll(me) or IsPedRagdoll(ped) then return false, 'Een van jullie ligt op de grond (ragdoll).' end
-    if IsPedSwimming(me) or IsPedFalling(me) or IsPedCuffed(me) then return false, 'Je kunt niet gijzelen terwijl je zwemt, valt of geboeid bent.' end
+    if busy() then return false, TSL('client_je_bent_al_bezig_met_een_gijzeling') end
+    if not ped or ped == me or ped == 0 or not IsPedAPlayer(ped) then return false, TSL('client_geen_andere_speler_dichtbij_npcs_worden_niet') end
+    if Bridge.IsDead(me) then return false, TSL('client_je_personage_staat_als_dood_of_zwaargewond') end
+    if IsEntityDead(ped) then return false, TSL('client_het_slachtoffer_is_dood') end
+    if IsPedRagdoll(me) or IsPedRagdoll(ped) then return false, TSL('client_een_van_jullie_ligt_op_de_grond') end
+    if IsPedSwimming(me) or IsPedFalling(me) or IsPedCuffed(me) then return false, TSL('client_je_kunt_niet_gijzelen_terwijl_je_zwemt') end
     local weapon = HostageWeaponHash(GetSelectedPedWeapon(me))
-    if weapon == GetHashKey('WEAPON_UNARMED') then return false, 'Neem eerst een toegestaan wapen in je hand.' end
-    if not weapons[weapon] then return false, ('Dit wapen staat niet in Config.Weapons (hash %s).'):format(weapon) end
-    if Config.RequireAmmo and weapons[weapon] == 'firearm' and GetAmmoInPedWeapon(me, weapon) < 1 then return false, 'Je vuurwapen heeft geen munitie.' end
+    if weapon == GetHashKey('WEAPON_UNARMED') then return false, TSL('client_neem_eerst_een_toegestaan_wapen_in_je') end
+    if not weapons[weapon] then return false, (TSL('client_dit_wapen_staat_niet_in_config_weapons')):format(weapon) end
+    if Config.RequireAmmo and weapons[weapon] == 'firearm' and GetAmmoInPedWeapon(me, weapon) < 1 then return false, TSL('client_je_vuurwapen_heeft_geen_munitie') end
     local distance = #(GetEntityCoords(me) - GetEntityCoords(ped))
-    if distance > Config.Distance then return false, ('Te ver weg: %.1f meter. Ga binnen %.1f meter staan.'):format(distance, Config.Distance) end
+    if distance > Config.Distance then return false, (TSL('client_te_ver_weg_meter_ga_binnen_meter')):format(distance, Config.Distance) end
     local allowed, inCar, reason = vehicleAllowed(me, ped)
     if not allowed then return false, reason end
-    if not inCar and not HasEntityClearLosToEntity(me, ped, 17) then return false, 'Geen vrij zicht op het slachtoffer. Ga dichterbij zonder obstakel ertussen.' end
-    if inCar and not Bridge.VehicleFirstPerson() then return false, 'Zet als bijrijder je voertuigcamera op first person.' end
+    if not inCar and not HasEntityClearLosToEntity(me, ped, 17) then return false, TSL('client_geen_vrij_zicht_op_het_slachtoffer_ga') end
+    if inCar and not Bridge.VehicleFirstPerson() then return false, TSL('client_zet_als_bijrijder_je_voertuigcamera_op_first') end
     return true
 end
 local function closest(vehicle)
@@ -80,13 +81,13 @@ local function explainFailure()
         end
     end
     local ok, reason = canTake(nearest)
-    return reason or (ok and 'Lokale controles akkoord; slachtoffercontrole volgt bij vastpakken.' or 'Geen geschikte speler.'), nearest
+    return reason or (ok and TSL('client_lokale_controles_akkoord_slachtoffercontrole_volgt_bij_vastpakken') or TSL('client_geen_geschikte_speler')), nearest
 end
 RegisterCommand('ts_hostagecheck', function()
     local reason, target = explainFailure()
     local ped = PlayerPedId()
-    print('[ts_hostagecheck] ' .. reason)
-    print(('[ts_hostagecheck] wapen=%s | toegestaan=%s | auto=%s | camera=%s | doel=%s'):format(
+    print(TSL('client_ts_hostagecheck') .. reason)
+    print((TSL('client_ts_hostagecheck_wapen_toegestaan_auto_camera_doel')):format(
         HostageWeaponHash(GetSelectedPedWeapon(ped)), tostring(weapons[HostageWeaponHash(GetSelectedPedWeapon(ped))] ~= nil),
         tostring(IsPedInAnyVehicle(ped, false)), GetFollowVehicleCamViewMode(),
         target and GetPlayerServerId(NetworkGetPlayerIndexFromPed(target)) or 'geen'))
@@ -136,10 +137,10 @@ RegisterNetEvent('ts_hostage:offer', function(id, captor, weapon, vehicle)
     end
     local ok = rejection == nil
     if rejection then
-        print('[ts_hostage slachtoffer] Afgewezen: ' .. rejection)
+        print(TSL('client_ts_hostage_slachtoffer_afgewezen') .. rejection)
         if rejection == 'hands' then
             for _, anim in ipairs({ Config.HandsUp.Anim }) do
-                print(('[ts_hostage slachtoffer] %s / %s = %s'):format(anim.dict, anim.clip,
+                print((TSL('client_ts_hostage_slachtoffer')):format(anim.dict, anim.clip,
                     tostring(HostageIsPlayingAnim(me, anim.dict, anim.clip, 3))))
             end
         end
@@ -221,7 +222,7 @@ RegisterCommand('+ts_hostage_action', function()
                 TriggerServerEvent('ts_hostage:cancel', s.id); return
             end
             if Config.RequireAmmo and s.kind == 'firearm' and GetAmmoInPedWeapon(PlayerPedId(), s.weapon) < 1 then
-                Bridge.Notify('Geen munitie. Laat de gijzelaar los.'); return
+                Bridge.Notify(TSL('client_geen_munitie_laat_de_gijzelaar_los')); return
             end
             TriggerServerEvent('ts_hostage:action', s.id, 'execute')
         end
@@ -237,8 +238,8 @@ RegisterCommand('+ts_hostage_release', function()
     end
 end, false)
 RegisterCommand('-ts_hostage_release', function() end, false)
-RegisterKeyMapping('+ts_hostage_action', 'TroyScripts: gijzelen / omleggen', 'keyboard', Config.Keys.Action)
-RegisterKeyMapping('+ts_hostage_release', 'TroyScripts: gijzelaar loslaten', 'keyboard', Config.Keys.Release)
+RegisterKeyMapping('+ts_hostage_action', TSL('client_troyscripts_gijzelen_omleggen'), 'keyboard', Config.Keys.Action)
+RegisterKeyMapping('+ts_hostage_release', TSL('client_troyscripts_gijzelaar_loslaten'), 'keyboard', Config.Keys.Release)
 
 CreateThread(function()
     while true do
@@ -257,7 +258,7 @@ CreateThread(function()
                     end
                 end
                 if s.active then
-                    hint(s.vehicle and 'Je bent gegijzeld. Je kunt blijven rijden en praten.' or 'Je bent gegijzeld. Je kunt nog praten.')
+                    hint(s.vehicle and TSL('client_je_bent_gegijzeld_je_kunt_blijven_rijden') or TSL('client_je_bent_gegijzeld_je_kunt_nog_praten'))
                 end
             else
                 for _, control in ipairs({ 21, 22, 23, 24, 25, 37, 44, 45, 47, 58, 75, 140, 141, 142, 143, 157, 158, 159, 160, 161, 162, 163, 164, 165, 261, 262 }) do
@@ -266,7 +267,7 @@ CreateThread(function()
                 if s.vehicle then
                     for _, control in ipairs({ 59, 60, 71, 72 }) do DisableControlAction(0, control, true) end
                 end
-                if s.active then hint(('Gijzelaar: ~y~%s~s~ omleggen | ~y~%s~s~ loslaten'):format(Config.Keys.Action, Config.Keys.Release)) end
+                if s.active then hint((TSL('client_gijzelaar_omleggen_loslaten')):format(Config.Keys.Action, Config.Keys.Release)) end
             end
         end
     end
@@ -297,14 +298,14 @@ end)
 local targetRegistered = false
 local targetResource = exports['ts_bridge']:GetTargetResource()
 local function registerTarget()
-    if Config.Interaction == 'key' or targetRegistered or GetResourceState(targetResource) ~= 'started' then return end
+    if not TSBridgeGuard.IsReady() or Config.Interaction == 'key' or targetRegistered or GetResourceState(targetResource) ~= 'started' then return end
     exports['ts_bridge']:AddGlobalPlayer({ {
-        name = 'ts_hostage_player', label = 'Gijzelen (handen omhoog vereist)', icon = 'fas fa-person-rifle', distance = Config.Distance,
+        name = 'ts_hostage_player', label = TSL('client_gijzelen_handen_omhoog_vereist'), icon = 'fas fa-person-rifle', distance = Config.Distance,
         canInteract = function(entity) return canTake(entity) end,
         onSelect = function(data) request(data.entity) end
     } })
     exports['ts_bridge']:AddGlobalVehicle({ {
-        name = 'ts_hostage_vehicle', label = 'Inzittende gijzelen (first person)', icon = 'fas fa-person-rifle', distance = Config.Distance,
+        name = 'ts_hostage_vehicle', label = TSL('client_inzittende_gijzelen_first_person'), icon = 'fas fa-person-rifle', distance = Config.Distance,
         canInteract = function(entity) return closest(entity) ~= nil end,
         onSelect = function(data) request(closest(data.entity)) end
     } })
@@ -319,7 +320,7 @@ CreateThread(function()
     Wait(1000)
     registerTarget()
     if Config.Interaction ~= 'key' and not targetRegistered then
-        print('^3[ts_hostage] ox_target ontbreekt. Start ox_target of kies Config.Interaction = key.^7')
+        print(TSL('client_ts_hostage_ox_target_ontbreekt_start_ox_target_of_kies'))
     end
 
 end)
@@ -330,3 +331,5 @@ AddEventHandler('onClientResourceStop', function(name)
     cleanup()
 
 end)
+
+AddEventHandler('ts_hostage:bridgeLost', function() cleanup(); targetRegistered = false end)

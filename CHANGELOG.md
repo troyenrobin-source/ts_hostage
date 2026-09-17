@@ -1,4 +1,13 @@
-# Wijziging 1.1.6 — ts_bridge-integratie
+# Changelog — ts_hostage
+
+## 1.1.7 — Bridgecontrole en aanpasbare locales
+- Verplicht ts_bridge 0.0.2(BETA) / API 1; controle op client en server.
+- Ontbrekende functies of oudere bridge blokkeren gameplay met een duidelijke melding.
+- Bij bridge-stop: lokale opruiming en stoppen van de afhankelijke resource.
+- Eigen locales-map, Nederlands standaard en fallback.
+- Manifest, config-opmerkingen, installatiehandleiding en versiegegevens bijgewerkt.
+
+## 1.1.6 — ts_bridge-integratie
 
 - Verplichte dependency op ts_bridge 0.0.1(BETA).
 - Meldingen, doodstatus, ESX-jobcontrole, targetkoppeling en waypoint naar de bridge.

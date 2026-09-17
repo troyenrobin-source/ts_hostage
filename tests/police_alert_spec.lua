@@ -1,3 +1,8 @@
+dofile('locales/nl.lua'); dofile('locale.lua')
+local ownLocale = Locales.nl
+ dofile('../ts_bridge/locales/nl.lua')
+ for key, value in pairs(ownLocale) do Locales.nl[key] = value end
+TSBridgeGuard = { Await = function() return true end, IsReady = function() return true end }
 local event, command, shown, waypoint
 local now = 1000
 function RegisterNetEvent(_, fn) event = fn end

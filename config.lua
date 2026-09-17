@@ -1,4 +1,6 @@
+-- Vereist ts_bridge 0.0.2(BETA), vóór dit script starten. Teksten: locales/nl.lua.
 Config = {}
+Config.Locale = 'nl' -- Hoofdtaal; teksten staan in locales/nl.lua
 Config.Interaction = 'both' -- 'target', 'key' of 'both'; target = ox_target
 Config.Keys = { Action = 'E', Release = 'X' }
 Config.Distance = 1.8

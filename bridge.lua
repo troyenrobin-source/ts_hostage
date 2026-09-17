@@ -1,10 +1,12 @@
+if not TSBridgeGuard.Await() then return end
 Bridge = {}
 
 function Bridge.Notify(message)
-    return exports['ts_bridge']:Notify(message)
+    if TSBridgeGuard.IsReady() then return exports['ts_bridge']:Notify(message) end
 end
 
 function Bridge.IsDead(ped)
+    if not TSBridgeGuard.IsReady() then return true end
     return exports['ts_bridge']:IsDead(ped)
 end
 

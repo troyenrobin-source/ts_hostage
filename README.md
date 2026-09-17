@@ -1,6 +1,6 @@
 # TroyScripts — ts_hostage
 
-**Versie 1.1.6** (vereist ts_bridge 0.0.1(BETA)) · FiveM · Gijzelingen te voet en in voertuigen
+**Versie 1.1.7** (vereist ts_bridge 0.0.2(BETA)) · FiveM · Gijzelingen te voet en in voertuigen
 
 Met `ts_hostage` kunnen spelers een andere speler gijzelen, loslaten of omleggen.
 De resource bevat een eigen handen-omhoog-functie, politiemeldingen met locatie
@@ -9,7 +9,16 @@ en een optioneel waypoint, plus Discord-logging met optionele screenshots.
 De huidige mespositie is behouden. De hand sluit nog niet anatomisch correct
 om het handvat; dit is een bekende beperking van deze versie.
 
-## Nieuw: centrale bridge
+## Taal en bridgecontrole
+
+`Config.Locale = 'nl'` is de standaard. Teksten staan in `locales/nl.lua`.
+Bij ontbrekende taal/sleutel wordt Nederlands gebruikt. Behoud placeholders en opmaakcodes.
+Eigen tekstvelden in server_config.lua blijven voorrang houden.
+
+`bridge_check.lua` controleert client en server. Zonder een compatibele bridge wordt
+het script niet actief. Herstart na een bridgeherstart ook ts_hostage; lees de updatehandleiding.
+
+## Centrale bridge
 
 Meldingen, ESX-jobcontrole, targetregistratie, webhooktransport en screenshots lopen
 nu via ts_bridge. Lees **UPDATE-INSTALLATIE.md** voor de migratie en centrale instellingen.
@@ -20,7 +29,7 @@ De bestaande GitHub-updatecontrole blijft behouden.
 | Onderdeel | Gebruik |
 | --- | --- |
 | FiveM met OneSync | Synchronisatie van spelers en gijzelingen. |
-| `ts_bridge` 0.0.1(BETA) | Centrale koppelingen; verplicht. |
+| `ts_bridge` 0.0.2(BETA) | Centrale koppelingen; verplicht. |
 | `ox_lib` | Meldingen via ts_bridge. |
 | `es_extended` (ESX) | Politieagenten herkennen voor de politiemeldingen. |
 | `ox_target` | Vereist bij `Config.Interaction = 'target'` of `'both'`. |
@@ -52,9 +61,9 @@ ensure ts_hostage
 ```
 
 Controleer na het starten de console. Voor deze versie hoort de opstartmelding
-versie **1.1.6** te vermelden.
+versie **1.1.7** te vermelden.
 
-## Bijwerken naar 1.1.6
+## Bijwerken naar 1.1.7
 
 1. Maak een backup van de bestaande resource, inclusief je configuratie.
 2. Stop de resource met `stop ts_hostage`.
@@ -249,7 +258,7 @@ en zitplaatsen. De gerepliceerde visuele status is geen anticheatbewijs.
 
 ## GitHub
 
-Repository: [troyscripts/ts_hostage](https://github.com/troyscripts/ts_hostage).
+Repository: [troyenrobin-source/ts_hostage](https://github.com/troyenrobin-source/ts_hostage).
 
 Plaats de inhoud van de resource in de hoofdmap van de repository, zodat
 `fxmanifest.lua` direct bovenaan staat. Hernoem een via GitHub uitgepakte
@@ -257,26 +266,25 @@ broncodemap zo nodig naar `ts_hostage` voordat je deze op de server plaatst.
 
 ### Updatecontrole
 
-Vanaf versie **1.1.6** is een GitHub-updatecontrole toegevoegd. Bij het starten
+De GitHub-updatecontrole uit versie **1.1.4** blijft behouden. Bij het starten
 controleert de resource of een nieuwere versie beschikbaar is. Wanneer dat zo is,
 verschijnt een melding in de serverconsole met een GitHub-link om de update op te halen.
 
-De repository is [troyscripts/ts_hostage](https://github.com/troyscripts/ts_hostage).
-Controleer bij de overstap naar dit GitHub-account ook de repositoryverwijzing
-in de updatecontrole van je geïnstalleerde script. Alleen een wijziging in deze
-README past de controle-URL in de code niet aan.
+De repository in de code is `troyenrobin-source/ts_hostage`. Deze update is niet automatisch
+naar GitHub gepubliceerd; publiceer version.json samen met de nieuwe bronbestanden.
 
 De controle installeert de update niet automatisch. Maak een backup en volg
-[Bijwerken naar 1.1.6](#bijwerken-naar-113) om een nieuwe versie handmatig te installeren.
+[Bijwerken naar 1.1.7](#bijwerken-naar-117) om een nieuwe versie handmatig te installeren.
 
 ## Changelog
 
-### 1.1.6 — GitHub-updatecontrole
+### 1.1.7 — Bridgecontrole en locales
 
-- GitHub-updatecontrole toegevoegd.
-- Melding met GitHub-link wanneer een nieuwere versie beschikbaar is.
-- Handleiding bijgewerkt naar versie 1.1.6 en repository `troyscripts/ts_hostage`.
-- Bestaande functies en bekende beperkingen blijven beschreven zoals in 1.1.2.
+- Vereist ts_bridge 0.0.2(BETA), met client/server-controle op versie, API en functies.
+- Veilige opruiming bij bridge-uitval en duidelijke consolemelding.
+- Aanpasbare locales/nl.lua, NL als standaard en fallback.
+- Bestaande gijzelingslogica en GitHub-updatecontrole behouden.
+- Volledige historie: zie CHANGELOG.md.
 
 ### 1.1.2 — Locatie en waypoint
 
@@ -307,7 +315,7 @@ De controle installeert de update niet automatisch. Maak een backup en volg
 Gijzelen te voet en in voertuigen is eerder door de gebruiker als werkend gemeld.
 De eerdere documentatie vermeldt Lua-syntaxcontroles en tests met gesimuleerde
 FiveM-functies voor versie 1.1.0. Die resultaten zijn geen volledige validatie
-van versie 1.1.6, live animaties of daadwerkelijke Discord-bezorging.
+van versie 1.1.7, live animaties of daadwerkelijke Discord-bezorging.
 
 Test na installatie of bijwerken:
 
@@ -327,7 +335,6 @@ Test na installatie of bijwerken:
 - [ox_target API](https://github.com/overextended/ox_target/blob/main/client/api.lua)
 - [Discord-webhooks](https://docs.discord.com/developers/resources/webhook)
 - [ox_lib-notificaties](https://overextended.dev/docs/ox_lib/Interface/Client/notify)
-- [troy's Gamecommunity](https://discord.gg/nTzVy5uMWX)
 
 ---
 

@@ -1,3 +1,4 @@
+if not TSBridgeGuard.Await() then return end
 -- Eigen H-toggle. Status en framegebonden combatblokkade hebben dezelfde eigenaar.
 HandsUp = {}
 local raised, pending, generation, ownerPed = false, false, 0, nil
@@ -47,7 +48,7 @@ exports('LowerHands', HandsUp.Lower)
 RegisterCommand('+ts_handsup', HandsUp.Toggle, false)
 RegisterCommand('-ts_handsup', function() end, false)
 RegisterCommand('handenomhoog', HandsUp.Toggle, false)
-RegisterKeyMapping('+ts_handsup', 'TroyScripts: handen omhoog / omlaag', 'keyboard', Config.HandsUp.Key)
+RegisterKeyMapping('+ts_handsup', TSL('handsup_troyscripts_handen_omhoog_omlaag'), 'keyboard', Config.HandsUp.Key)
 CreateThread(function()
     while true do
         if not raised then Wait(150) else

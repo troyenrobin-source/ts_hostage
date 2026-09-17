@@ -1,3 +1,4 @@
+if not TSBridgeGuard.Await() then return end
 -- Visuele keelpositie, lokaal weergegeven voor iedere speler in streamingbereik.
 -- De serversessie/echte inventaris blijven leidend; het object geeft geen wapen.
 local visuals = {}
@@ -71,7 +72,7 @@ CreateThread(function()
                                 if type(pose.bladeContact)=='table' then v.contact=pose.bladeContact end
                                 if pose.axis then v.axis=pose.axis end
                                 if ped==PlayerPedId() then
-                                    print(('[ts_mespositie] world-pose model=%s as=%s contact=%.3f,%.3f,%.3f'):format(v.model,v.axis,v.contact.x,v.contact.y,v.contact.z))
+                                    print((TSL('blade_pose_ts_mespositie_world_pose_model_as_contact')):format(v.model,v.axis,v.contact.x,v.contact.y,v.contact.z))
                                 end
                                 SetEntityVisible(object,false,false)
                                 place(v)

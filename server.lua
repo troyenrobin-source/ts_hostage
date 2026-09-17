@@ -1,3 +1,4 @@
+if not TSBridgeGuard.Await() then return end
 local sessions, busy, cooldown = {}, {}, {}
 local serial = 0
 local weaponTypes = {}
@@ -14,17 +15,17 @@ local function notifyPolice(session)
         if ped == 0 then return 0 end
         local coords = GetEntityCoords(ped)
         return exports['ts_bridge']:AlertJobs(cfg.Jobs or { police = true }, {
-            title = cfg.Title or 'Politiemelding',
-            description = cfg.Description or 'Er is een gijzeling gaande! Een persoon wordt gegijzeld.',
+            title = cfg.Title or TSL('server_politiemelding'),
+            description = cfg.Description or TSL('server_er_is_een_gijzeling_gaande_een_persoon'),
             duration = cfg.Duration or 10000,
             position = cfg.Position or 'top-right',
             type = 'warning', icon = 'shield-halved'
         }, { x = coords.x, y = coords.y, z = coords.z }, cfg.WaypointSeconds or 60)
     end)
     if ok then
-        print(('[Troy Scripts] Politiemelding verstuurd naar %d agent(en).'):format(result or 0))
-        if result == 0 then print('[Troy Scripts] Controleer ts_bridge_check en PoliceAlertConfig.Jobs.') end
-    else print('^1[Troy Scripts] Politiemelding via ts_bridge mislukt.^7') end
+        print((TSL('server_troy_scripts_politiemelding_verstuurd_naar_agent_en')):format(result or 0))
+        if result == 0 then print(TSL('server_troy_scripts_controleer_ts_bridge_check_en_policealertconfig_jobs')) end
+    else print(TSL('server_troy_scripts_politiemelding_via_ts_bridge_mislukt')) end
 end
 
 -- Alleen serverconsole: test dezelfde ontvangers en clientmelding zonder gijzeling.
@@ -32,10 +33,10 @@ RegisterCommand('ts_hostage_policecheck', function(src, args)
     if src ~= 0 then return end
     local id = tonumber(args[1])
     if not id or id <= 0 or id % 1 ~= 0 or GetPlayerPed(id) == 0 then
-        print('[TroyScripts] Gebruik: ts_hostage_policecheck <online speler-ID>')
+        print(TSL('server_troyscripts_gebruik_ts_hostage_policecheck_online_speler_id'))
         return
     end
-    print('[TroyScripts] Testmelding naar politie; locatie van speler ' .. id)
+    print(TSL('server_troyscripts_testmelding_naar_politie_locatie_van_speler') .. id)
     notifyPolice({ captor = id })
 end, false)
 
@@ -67,17 +68,18 @@ end
 
 RegisterNetEvent('ts_hostage:request', function(target)
     local src = source
+    if not TSBridgeGuard.IsReady() then return end
     if type(target) ~= 'number' or target % 1 ~= 0 or target <= 0 or target == src then return end
     local now = GetGameTimer()
     if cooldown[src] and now - cooldown[src] < Config.RequestCooldownMs then return end
     cooldown[src] = now
-    if busy[src] or busy[target] then notify(src, 'Een van jullie is al bezig met een gijzeling.'); return end
+    if busy[src] or busy[target] then notify(src, TSL('server_een_van_jullie_is_al_bezig_met')); return end
     local ped = GetPlayerPed(src)
     if ped == 0 then return end
     serial = serial + 1
     local s = { id = serial, captor = src, victim = target, weapon = HostageWeaponHash(GetSelectedPedWeapon(ped)),
         vehicle = GetVehiclePedIsIn(ped, false), phase = 'pending', created = now, ready = {} }
-    if not valid(s, true) then notify(src, 'Niet mogelijk: controleer afstand, wapen en zitplaatsen.'); return end
+    if not valid(s, true) then notify(src, TSL('server_niet_mogelijk_controleer_afstand_wapen_en_zitplaatsen')); return end
     s.kind = weaponTypes[s.weapon]
     HostageLog.Snapshot(s)
     sessions[s.id], busy[src], busy[target] = s, s.id, s.id
@@ -86,7 +88,7 @@ RegisterNetEvent('ts_hostage:request', function(target)
     SetTimeout(Config.HandshakeTimeoutMs, function()
         if sessions[s.id] and s.phase ~= 'active' then
             finish(s, false)
-            notify(src, 'Gijzeling afgebroken: geen geldige bevestiging ontvangen.')
+            notify(src, TSL('server_gijzeling_afgebroken_geen_geldige_bevestiging_ontvangen'))
         end
     end)
 end)
@@ -96,25 +98,25 @@ RegisterNetEvent('ts_hostage:accept', function(id, accepted, rejection)
     if not s or source ~= s.victim or s.phase ~= 'pending' then return end
     if accepted ~= true then
         local reasons = {
-            busy = 'Slachtoffer is al bezig met een gijzeling.',
-            peer = 'Slachtoffer ziet de gijzelnemer nog niet. Probeer opnieuw.',
-            dead = 'Slachtoffer staat als dood of zwaargewond geregistreerd.',
-            ragdoll = 'Slachtoffer ligt op de grond (ragdoll).',
-            cuffed = 'Slachtoffer is geboeid.',
-            hands = 'Slachtoffer moet met H of /handenomhoog de TroyScripts-handen omhoog doen.',
-            weapon = 'Wapen ontbreekt in de configuratie van het slachtoffer. Herstart de resource.',
-            vehicle = 'Voertuig of zitplaats klopt niet volgens slachtofferclient.',
-            distance = 'Afstand is te groot volgens slachtofferclient.',
-            los = 'Slachtofferclient meldt geen vrij zicht. Ga recht tegenover elkaar staan.'
+            busy = TSL('server_slachtoffer_is_al_bezig_met_een_gijzeling'),
+            peer = TSL('server_slachtoffer_ziet_de_gijzelnemer_nog_niet_probeer'),
+            dead = TSL('server_slachtoffer_staat_als_dood_of_zwaargewond_geregistreerd'),
+            ragdoll = TSL('server_slachtoffer_ligt_op_de_grond_ragdoll'),
+            cuffed = TSL('server_slachtoffer_is_geboeid'),
+            hands = TSL('server_slachtoffer_moet_met_of_handenomhoog_de_troyscripts'),
+            weapon = TSL('server_wapen_ontbreekt_in_de_configuratie_van_het'),
+            vehicle = TSL('server_voertuig_of_zitplaats_klopt_niet_volgens_slachtofferclient'),
+            distance = TSL('server_afstand_is_te_groot_volgens_slachtofferclient'),
+            los = TSL('server_slachtofferclient_meldt_geen_vrij_zicht_ga_recht')
         }
         local message = type(rejection) == 'string' and reasons[rejection] or nil
         finish(s, false)
-        notify(s.captor, message or 'Slachtofferclient heeft de gijzeling geweigerd.')
+        notify(s.captor, message or TSL('server_slachtofferclient_heeft_de_gijzeling_geweigerd'))
         return
     end
     if not valid(s, true) then
         finish(s, false)
-        notify(s.captor, 'Servercontrole gewijzigd: afstand, wapen, gezondheid of zitplaats. Probeer opnieuw.')
+        notify(s.captor, TSL('server_servercontrole_gewijzigd_afstand_wapen_gezondheid_of_zitplaats'))
         return
     end
     s.phase = 'preparing'
@@ -143,23 +145,23 @@ end)
 RegisterNetEvent('ts_hostage:action', function(id, action)
     local s = sessions[id]
     if not s or source ~= s.captor or s.phase ~= 'active' then return end
-    if action == 'release' then finish(s, false, 'release', 'Losgelaten door gijzelnemer'); return end
+    if action == 'release' then finish(s, false, 'release', TSL('server_losgelaten_door_gijzelnemer')); return end
     if action ~= 'execute' or GetGameTimer() - s.activeAt < Config.ExecuteDelayMs then return end
     if not valid(s, false) then finish(s, false); return end
     -- Doel wordt UITSLUITEND uit de serversessie gehaald, nooit uit een client-event.
     -- Ammunitie is op de captorclient gecontroleerd; inventarisspecifieke serverside
     -- ammo-adapters kunnen hier toegevoegd worden (OneSync meldt geen betrouwbare clip).
-    finish(s, true, 'execute', 'Omleggen door de server toegestaan')
+    finish(s, true, 'execute', TSL('server_omleggen_door_de_server_toegestaan'))
 end)
 
 RegisterNetEvent('ts_hostage:cancel', function(id)
     local s = sessions[id]
-    if s and (source == s.captor or source == s.victim) then finish(s, false, 'automatic', 'Clientcontrole: camera of spelertoestand gewijzigd') end
+    if s and (source == s.captor or source == s.victim) then finish(s, false, 'automatic', TSL('server_clientcontrole_camera_of_spelertoestand_gewijzigd')) end
 end)
 AddEventHandler('playerDropped', function()
     local src = source
     local s = sessions[busy[src]]
-    if s then finish(s, false, 'automatic', 'Speler heeft de server verlaten') end
+    if s then finish(s, false, 'automatic', TSL('server_speler_heeft_de_server_verlaten')) end
     cooldown[src] = nil
 end)
 CreateThread(function()
@@ -169,13 +171,13 @@ CreateThread(function()
         for _, s in pairs(sessions) do
             if not valid(s, s.phase ~= 'active') then remove[#remove + 1] = s end
         end
-        for _, s in ipairs(remove) do finish(s, false, 'automatic', 'Servercontrole of resource gestopt') end
+        for _, s in ipairs(remove) do finish(s, false, 'automatic', TSL('server_servercontrole_of_resource_gestopt')) end
     end
 end)
 AddEventHandler('onResourceStop', function(name)
     if name ~= GetCurrentResourceName() then return end
     local remove = {}
     for _, s in pairs(sessions) do remove[#remove + 1] = s end
-    for _, s in ipairs(remove) do finish(s, false, 'automatic', 'Servercontrole of resource gestopt') end
+    for _, s in ipairs(remove) do finish(s, false, 'automatic', TSL('server_servercontrole_of_resource_gestopt')) end
 end)
-print(('^5[TroyScripts]^7 ts_hostage %s gestart'):format(GetResourceMetadata(GetCurrentResourceName(), 'version', 0) or 'onbekend'))
+print((TSL('server_troyscripts_ts_hostage_gestart')):format(GetResourceMetadata(GetCurrentResourceName(), 'version', 0) or 'onbekend'))

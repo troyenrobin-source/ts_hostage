@@ -1,3 +1,8 @@
+dofile('locales/nl.lua'); dofile('locale.lua')
+local ownLocale = Locales.nl
+ dofile('../ts_bridge/locales/nl.lua')
+ for key, value in pairs(ownLocale) do Locales.nl[key] = value end
+TSBridgeGuard = { Await = function() return true end, IsReady = function() return true end }
 local commands, notices, requests = {}, {}, {}
 local weapon, distance, vehicle, camera = 0, 1, false, 0
 local vec = {}; vec.__sub = function() return setmetatable({}, { __len = function() return distance end }) end

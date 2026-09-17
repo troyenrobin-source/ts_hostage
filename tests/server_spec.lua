@@ -1,3 +1,8 @@
+dofile('locales/nl.lua'); dofile('locale.lua')
+local ownLocale = Locales.nl
+ dofile('../ts_bridge/locales/nl.lua')
+ for key, value in pairs(ownLocale) do Locales.nl[key] = value end
+TSBridgeGuard = { Await = function() return true end, IsReady = function() return true end }
 function Player() return { state = { set = function() end } } end
 HostageLog = { Snapshot = function() end, Event = function() end }
 -- Run from ts_hostage with Lua 5.4: lua tests/server_spec.lua
@@ -47,7 +52,7 @@ end })
 setmetatable(exports, { __call = function(_, name, fn) bridgeExports[name] = fn end })
 function GetInvokingResource() return 'ts_hostage' end
 
-function GetResourceMetadata() return '1.1.6' end
+function GetResourceMetadata() return '1.1.7' end
 dofile('../ts_bridge/config.lua')
 dofile('../ts_bridge/server_config.lua')
 dofile('../ts_bridge/server/main.lua')
