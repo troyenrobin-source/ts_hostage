@@ -3,7 +3,7 @@ TSBridgeGuard = { ready = false, failed = false }
 local G = TSBridgeGuard
 local resource = GetCurrentResourceName()
 local server = IsDuplicityVersion()
-local required = server and { 'AlertJobs', 'SendWebhook' } or { 'Notify', 'IsDead', 'GetTargetResource', 'AddGlobalPlayer', 'AddGlobalVehicle' }
+local required = server and { 'AlertJobs', 'SendWebhook', 'CheckConfigVersion' } or { 'CheckConfigVersion', 'RegisterRadialMenu', 'RemoveRadialMenu', 'Notify', 'IsDead', 'GetTargetResource', 'AddGlobalPlayer', 'AddGlobalVehicle' }
 local function fail(reason)
     G.ready, G.failed = false, true
     print((TSL('bridge_check_troy_scripts_gestopt_ts_bridge_controle_mislukt_installeer')):format(resource, reason))
@@ -28,7 +28,7 @@ function G.Await()
         return fail(TSL('bridge_check_ongeldige_api_of_verkeerde_client_server_versie'))
     end
     local major, minor, patch = status.version:match('^(%d+)%.(%d+)%.(%d+)')
-    if not major or (tonumber(major) == 0 and tonumber(minor) == 0 and tonumber(patch) < 2) then
+    if not major or (tonumber(major) == 0 and tonumber(minor) == 0 and tonumber(patch) < 3) then
         return fail(TSL('bridge_check_minimum_version'))
     end
     for _, feature in ipairs(required) do

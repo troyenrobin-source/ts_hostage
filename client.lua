@@ -1,6 +1,15 @@
 if not TSBridgeGuard.Await() then return end
 local session, offered = nil, nil
 local nextRequest, actionAt = 0, 0
+local requestSerial, noticeContext = 0, nil
+local function startContextAllowed(mode)
+    if not TSBridgeGuard.IsReady() then return false end
+    if GetVehiclePedIsIn(PlayerPedId(), false) ~= 0 then return Bridge.VehicleFirstPerson() end
+    if mode ~= 'key' or Config.RequireAimOnFoot == false then return true end
+    -- INPUT_AIM ondersteunt ook messen en aangepaste toetsen/controllerbindings.
+    return HostageBool(IsPlayerFreeAiming(PlayerId())) or HostageBool(IsControlPressed(0, 25))
+        or HostageBool(IsDisabledControlPressed(0, 25))
+end
 local weapons = {}
 for name, kind in pairs(Config.Weapons) do weapons[HostageWeaponHash(GetHashKey(name))] = kind end
 local function serverOnly() return source == 65535 end
@@ -93,11 +102,24 @@ RegisterCommand('ts_hostagecheck', function()
         target and GetPlayerServerId(NetworkGetPlayerIndexFromPed(target)) or 'geen'))
     Bridge.Notify(reason)
 end, false)
-local function request(ped)
-    if GetGameTimer() < nextRequest or not ped or not canTake(ped) then return end
+local function request(ped, mode)
+    mode = mode or 'target'
+    if GetGameTimer() < nextRequest or not startContextAllowed(mode) or not ped or not canTake(ped) then return end
     nextRequest = GetGameTimer() + Config.RequestCooldownMs
-    TriggerServerEvent('ts_hostage:request', GetPlayerServerId(NetworkGetPlayerIndexFromPed(ped)))
+    requestSerial = requestSerial + 1
+    noticeContext = { id = requestSerial, mode = mode, expires = GetGameTimer() + Config.HandshakeTimeoutMs + 2000 }
+    TriggerServerEvent('ts_hostage:request', GetPlayerServerId(NetworkGetPlayerIndexFromPed(ped)), requestSerial)
 end
+local function tryStart(mode)
+    if busy() or not startContextAllowed(mode) or GetGameTimer() < nextRequest then return end
+    local ped = closest()
+    if ped then request(ped, mode) else
+        nextRequest = GetGameTimer() + Config.RequestCooldownMs
+        local reason = explainFailure()
+        Bridge.Notify(reason)
+    end
+end
+exports('TakeHostage', function() tryStart('radial') end)
 local function cleanup()
     local s, ped = session, PlayerPedId()
     session, offered = nil, nil
@@ -111,8 +133,12 @@ local function cleanup()
     end
     Bridge.BusyChanged(false, nil)
 end
-RegisterNetEvent('ts_hostage:notify', function(message)
-    if serverOnly() then Bridge.Notify(message) end
+RegisterNetEvent('ts_hostage:notify', function(message, requestId)
+    if not serverOnly() or type(message) ~= 'string' then return end
+    local context = noticeContext
+    if not context or context.id ~= requestId or GetGameTimer() > context.expires then return end
+    if not startContextAllowed(context.mode) then return end
+    Bridge.Notify(message)
 end)
 RegisterNetEvent('ts_hostage:offer', function(id, captor, weapon, vehicle)
     if not serverOnly() then return end
@@ -211,7 +237,7 @@ RegisterNetEvent('ts_hostage:finish', function(id, execute)
     if execute and victim then Bridge.Kill() end
 end)
 
-RegisterCommand('+ts_hostage_action', function()
+local function hostageAction()
     local s = session
     if s then
         if s.active and s.role == 'captor' and GetGameTimer() - s.started >= Config.ExecuteDelayMs
@@ -226,17 +252,21 @@ RegisterCommand('+ts_hostage_action', function()
             end
             TriggerServerEvent('ts_hostage:action', s.id, 'execute')
         end
-    elseif Config.Interaction == 'key' or Config.Interaction == 'both' then
-        local ped = closest()
-        if ped then request(ped) else local reason = explainFailure(); Bridge.Notify(reason) end
     end
+end
+RegisterCommand('+ts_hostage_action', function()
+    if session then hostageAction()
+    elseif Config.Interaction == 'key' or Config.Interaction == 'both' then tryStart('key') end
 end, false)
+exports('ExecuteHostage', hostageAction)
 RegisterCommand('-ts_hostage_action', function() end, false)
-RegisterCommand('+ts_hostage_release', function()
+local function releaseHostage()
     if session and session.role == 'captor' then
         TriggerServerEvent('ts_hostage:action', session.id, 'release')
     end
-end, false)
+end
+RegisterCommand('+ts_hostage_release', releaseHostage, false)
+exports('ReleaseHostage', releaseHostage)
 RegisterCommand('-ts_hostage_release', function() end, false)
 RegisterKeyMapping('+ts_hostage_action', TSL('client_troyscripts_gijzelen_omleggen'), 'keyboard', Config.Keys.Action)
 RegisterKeyMapping('+ts_hostage_release', TSL('client_troyscripts_gijzelaar_loslaten'), 'keyboard', Config.Keys.Release)

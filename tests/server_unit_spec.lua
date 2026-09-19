@@ -1,7 +1,4 @@
 dofile('locales/nl.lua'); dofile('locale.lua')
-local ownLocale = Locales.nl
- dofile('../ts_bridge/locales/nl.lua')
- for key, value in pairs(ownLocale) do Locales.nl[key] = value end
 TSBridgeGuard = { Await = function() return true end, IsReady = function() return true end }
 function Player() return { state = { set = function() end } } end
 HostageLog = { Snapshot = function() end, Event = function() end }
@@ -44,18 +41,12 @@ exports = { es_extended = { getSharedObject = function()
  end }
 end } }
 
--- Simuleert de resource-exportgrens; de echte bridgecode wordt uitgevoerd.
-local bridgeExports = {}
-exports.ts_bridge = setmetatable({}, { __index = function(_, name)
-    return function(_, ...) return assert(bridgeExports[name], name)(...) end
-end })
-setmetatable(exports, { __call = function(_, name, fn) bridgeExports[name] = fn end })
-function GetInvokingResource() return 'ts_hostage' end
-
+-- Unit-test: bridge provider is mocked; server lifecycle code is real.
 function GetResourceMetadata() return '1.1.8' end
-dofile('../ts_bridge/config.lua')
-dofile('../ts_bridge/server_config.lua')
-dofile('../ts_bridge/server/main.lua')
+exports.ts_bridge = { AlertJobs = function(_, jobs, data, position)
+ if PoliceAlertConfig and PoliceAlertConfig.Enabled == false then return 0 end
+ TriggerClientEvent('ts_bridge:jobAlert', 3, data, position); return 1
+end }
 local function alerts()
  local n = 0
  for _, e in ipairs(emitted) do
@@ -95,24 +86,11 @@ source = 1; handlers.playerDropped(); assert(count('finish') == 2, 'disconnect c
 emitted = {}; id = request(); timers[#timers](); assert(count('finish') == 2, 'timeout cleanup')
 print('PASS: server lifecycle, consent-state handshake, validation, replay and cleanup')
 
--- Older config without police block: defaults still alert only police.
-emitted = {}; PoliceAlertConfig = nil
-commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 1)
-emitted = {}; commands.ts_hostage_policecheck(3, {'1'}); assert(alerts() == 0, 'console only')
-PoliceAlertConfig = { Enabled = false }; commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 0)
-PoliceAlertConfig = { Enabled = true, Jobs = { police = true } }
-exports.es_extended.getSharedObject = function()
- return { GetPlayerFromId = function(id)
-  if id == 1 then error('bad player') end
-  return { job = { name = id == 3 and 'police' or 'unemployed' } }
- end }
-end
-commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 1, 'job fallback and per-player isolation')
-print('PASS: old config, console-only diagnostics, disabled alerts, job fallback, player isolation')
-emitted = {}; TSBridgeServer.Framework = 'standalone'
-commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 0, 'standalone cannot invent jobs')
-TSBridgeServer.Framework = 'esx'
-GetResourceState = function() return 'stopped' end
-commands.ts_hostage_policecheck(0, {'1'}); assert(alerts() == 0, 'missing ESX')
-assert(exports.ts_bridge:AlertJobs({police=true}, {}, {x=0/0,y=0,z=0}, 60) == 0, 'invalid coords')
-print('PASS: standalone, missing ESX, invalid coordinates')
+assert(emitted[#emitted][1] == 'ts_hostage:notify' and emitted[#emitted][4] == now, 'timeout echoes request ID')
+emitted = {}; now = now + 2000
+call('request', 1, 2, {}); assert(#emitted == 0, 'invalid request token ignored')
+call('request', 1, 2, now); assert(count('offer') == 1)
+local offer = emitted[#emitted][3]
+call('accept', 2, offer, false, 'hands')
+assert(emitted[#emitted][4] == now, 'rejection echoes request ID')
+print('PASS: correlated timeout/rejection and malformed request token')

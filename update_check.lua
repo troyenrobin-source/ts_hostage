@@ -1,8 +1,8 @@
 -- Controleert eenmaal bij iedere start. Downloadt of voert geen externe code uit.
 local resource = GetCurrentResourceName()
-local repository = 'https://github.com/troyenrobin-source/ts_hostage'
+local repository = 'https://github.com/troyscripts/ts_hostage'
 -- Zonder ref gebruikt GitHub de standaardbranch (main of master).
-local endpoint = 'https://api.github.com/repos/troyenrobin-source/ts_hostage/contents/version.json'
+local endpoint = 'https://api.github.com/repos/troyscripts/ts_hostage/contents/version.json'
 local function log(message)
     print(TSL('update_check_troyscripts') .. message)
 end

@@ -4,7 +4,7 @@ local serial = 0
 local weaponTypes = {}
 for name, kind in pairs(Config.Weapons) do weaponTypes[HostageWeaponHash(GetHashKey(name))] = kind end
 
-local function notify(id, msg) TriggerClientEvent('ts_hostage:notify', id, msg) end
+local function notify(id, msg, requestId) TriggerClientEvent('ts_hostage:notify', id, msg, requestId) end
 
 -- De gevalideerde sessie bepaalt de locatie; de bridge controleert de jobs.
 local function notifyPolice(session)
@@ -66,20 +66,21 @@ local function valid(s, starting)
     return false
 end
 
-RegisterNetEvent('ts_hostage:request', function(target)
+RegisterNetEvent('ts_hostage:request', function(target, requestId)
+    if type(requestId) ~= 'number' or requestId % 1 ~= 0 or requestId < 1 or requestId > 2147483647 then return end
     local src = source
     if not TSBridgeGuard.IsReady() then return end
     if type(target) ~= 'number' or target % 1 ~= 0 or target <= 0 or target == src then return end
     local now = GetGameTimer()
     if cooldown[src] and now - cooldown[src] < Config.RequestCooldownMs then return end
     cooldown[src] = now
-    if busy[src] or busy[target] then notify(src, TSL('server_een_van_jullie_is_al_bezig_met')); return end
+    if busy[src] or busy[target] then notify(src, TSL('server_een_van_jullie_is_al_bezig_met'), requestId); return end
     local ped = GetPlayerPed(src)
     if ped == 0 then return end
     serial = serial + 1
-    local s = { id = serial, captor = src, victim = target, weapon = HostageWeaponHash(GetSelectedPedWeapon(ped)),
+    local s = { id = serial, requestId = requestId, captor = src, victim = target, weapon = HostageWeaponHash(GetSelectedPedWeapon(ped)),
         vehicle = GetVehiclePedIsIn(ped, false), phase = 'pending', created = now, ready = {} }
-    if not valid(s, true) then notify(src, TSL('server_niet_mogelijk_controleer_afstand_wapen_en_zitplaatsen')); return end
+    if not valid(s, true) then notify(src, TSL('server_niet_mogelijk_controleer_afstand_wapen_en_zitplaatsen'), requestId); return end
     s.kind = weaponTypes[s.weapon]
     HostageLog.Snapshot(s)
     sessions[s.id], busy[src], busy[target] = s, s.id, s.id
@@ -88,7 +89,7 @@ RegisterNetEvent('ts_hostage:request', function(target)
     SetTimeout(Config.HandshakeTimeoutMs, function()
         if sessions[s.id] and s.phase ~= 'active' then
             finish(s, false)
-            notify(src, TSL('server_gijzeling_afgebroken_geen_geldige_bevestiging_ontvangen'))
+            notify(src, TSL('server_gijzeling_afgebroken_geen_geldige_bevestiging_ontvangen'), requestId)
         end
     end)
 end)
@@ -111,12 +112,12 @@ RegisterNetEvent('ts_hostage:accept', function(id, accepted, rejection)
         }
         local message = type(rejection) == 'string' and reasons[rejection] or nil
         finish(s, false)
-        notify(s.captor, message or TSL('server_slachtofferclient_heeft_de_gijzeling_geweigerd'))
+        notify(s.captor, message or TSL('server_slachtofferclient_heeft_de_gijzeling_geweigerd'), s.requestId)
         return
     end
     if not valid(s, true) then
         finish(s, false)
-        notify(s.captor, TSL('server_servercontrole_gewijzigd_afstand_wapen_gezondheid_of_zitplaats'))
+        notify(s.captor, TSL('server_servercontrole_gewijzigd_afstand_wapen_gezondheid_of_zitplaats'), s.requestId)
         return
     end
     s.phase = 'preparing'

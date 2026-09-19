@@ -2,7 +2,11 @@ if not TSBridgeGuard.Await() then return end
 Bridge = {}
 
 function Bridge.Notify(message)
-    if TSBridgeGuard.IsReady() then return exports['ts_bridge']:Notify(message) end
+    if not TSBridgeGuard.IsReady() then return end
+    if GetVehiclePedIsIn(PlayerPedId(), false) ~= 0 and not Bridge.VehicleFirstPerson() then return end
+    local cooldown = math.max(0, tonumber(Config.NotificationCooldownMs) or 5000)
+    return exports['ts_bridge']:Notify({ id = 'ts_hostage_notice', title = TSL('notification_title'),
+        description = message, type = 'inform', duration = math.max(1, math.min(5000, cooldown)) }, cooldown)
 end
 
 function Bridge.IsDead(ped)

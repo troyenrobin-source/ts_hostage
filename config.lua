@@ -1,5 +1,10 @@
--- Vereist ts_bridge 0.0.2(BETA), vóór dit script starten. Teksten: locales/nl.lua.
+-- Vereist ts_bridge 0.0.3, vóór dit script starten. Teksten: locales/nl.lua.
 Config = {}
+-- Alleen verhogen wanneer de CONFIG-indeling wijzigt, niet bij iedere scriptupdate.
+Config.Version = '1.1.8'
+Config.RequireAimOnFoot = true -- alleen sneltoets E; target/radial zijn bewuste keuzes
+Config.NotificationCooldownMs = 5000 -- alle gewone meldingen samen
+Config.Radial = { Enabled = true } -- ox_lib; zet uit bij een eigen radialmenu
 Config.Locale = 'nl' -- Hoofdtaal; teksten staan in locales/nl.lua
 Config.Interaction = 'both' -- 'target', 'key' of 'both'; target = ox_target
 Config.Keys = { Action = 'E', Release = 'X' }

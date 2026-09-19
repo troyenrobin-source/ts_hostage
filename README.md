@@ -1,6 +1,6 @@
 # TroyScripts — ts_hostage
 
-**Versie 1.1.7** (vereist ts_bridge 0.0.2(BETA)) · FiveM · Gijzelingen te voet en in voertuigen
+**Versie 1.1.8** (vereist ts_bridge 0.0.3) · FiveM · Gijzelingen te voet en in voertuigen
 
 Met `ts_hostage` kunnen spelers een andere speler gijzelen, loslaten of omleggen.
 De resource bevat een eigen handen-omhoog-functie, politiemeldingen met locatie
@@ -20,8 +20,9 @@ het script niet actief. Herstart na een bridgeherstart ook ts_hostage; lees de u
 
 ## Centrale bridge
 
-Meldingen, ESX-jobcontrole, targetregistratie, webhooktransport en screenshots lopen
-nu via ts_bridge. Lees **UPDATE-INSTALLATIE.md** voor de migratie en centrale instellingen.
+ESX-jobcontrole, politiemeldingen, targetregistratie, webhooktransport en screenshots lopen
+via ts_bridge. Gewone spelersmeldingen, meldingslimieten en het radialmenu lopen nu ook via
+ts_bridge 0.0.3. Configversiecontrole wordt door de bridge uitgevoerd. Lees **UPDATE-INSTALLATIE.md** voor de migratie en centrale instellingen.
 De bestaande GitHub-updatecontrole blijft behouden.
 
 ## Vereisten
@@ -29,8 +30,8 @@ De bestaande GitHub-updatecontrole blijft behouden.
 | Onderdeel | Gebruik |
 | --- | --- |
 | FiveM met OneSync | Synchronisatie van spelers en gijzelingen. |
-| `ts_bridge` 0.0.2(BETA) | Centrale koppelingen; verplicht. |
-| `ox_lib` | Meldingen via ts_bridge. |
+| `ts_bridge` 0.0.3 | Centrale koppelingen; verplicht. |
+| `ox_lib` | UI-provider voor meldingen en radialmenu via de bridge. |
 | `es_extended` (ESX) | Politieagenten herkennen voor de politiemeldingen. |
 | `ox_target` | Vereist bij `Config.Interaction = 'target'` of `'both'`. |
 | `screenshot-basic` | Optioneel, voor foto's in Discord-logs. |
@@ -61,9 +62,9 @@ ensure ts_hostage
 ```
 
 Controleer na het starten de console. Voor deze versie hoort de opstartmelding
-versie **1.1.7** te vermelden.
+versie **1.1.8** te vermelden.
 
-## Bijwerken naar 1.1.7
+## Bijwerken naar 1.1.8
 
 1. Maak een backup van de bestaande resource, inclusief je configuratie.
 2. Stop de resource met `stop ts_hostage`.
@@ -83,7 +84,7 @@ databasemigratie beschreven.
 | Actie | Standaardbediening |
 | --- | --- |
 | Handen omhoog of omlaag | **H** of `/handenomhoog` |
-| Speler vastpakken | **E** of `ox_target` |
+| Speler vastpakken | Richten + **E**, `ox_target` of radialmenu |
 | Gijzelaar omleggen | **E** tijdens een actieve gijzeling, na minimaal 1,5 seconde |
 | Gijzelaar loslaten | **X** |
 | Waypoint naar de laatste politiemelding | **G**, standaard binnen 60 seconden |
@@ -94,6 +95,8 @@ Persoonlijke FiveM-keybindings kunnen afwijken van de standaardtoetsen.
 
 - Het slachtoffer gebruikt de eigen handen-omhoog-functie van `ts_hostage`.
 - De gijzelnemer houdt een toegestaan wapen vast.
+- Bij de sneltoets moet je eerst richten. Ox_target en radial vereisen te voet geen richten.
+- Alleen richten geeft geen melding; er moet een bewuste gijzelactie volgen.
 - De spelers staan standaard maximaal 1,8 meter van elkaar.
 - Tijdens de gijzeling kan de gijzelnemer wandelen.
 - Het slachtoffer kan praten, maar niet zelfstandig bewegen of vechten.
@@ -258,7 +261,7 @@ en zitplaatsen. De gerepliceerde visuele status is geen anticheatbewijs.
 
 ## GitHub
 
-Repository: [troyenrobin-source/ts_hostage](https://github.com/troyenrobin-source/ts_hostage).
+Repository: [troyscripts/ts_hostage](https://github.com/troyscripts/ts_hostage).
 
 Plaats de inhoud van de resource in de hoofdmap van de repository, zodat
 `fxmanifest.lua` direct bovenaan staat. Hernoem een via GitHub uitgepakte
@@ -270,17 +273,17 @@ De GitHub-updatecontrole uit versie **1.1.4** blijft behouden. Bij het starten
 controleert de resource of een nieuwere versie beschikbaar is. Wanneer dat zo is,
 verschijnt een melding in de serverconsole met een GitHub-link om de update op te halen.
 
-De repository in de code is `troyenrobin-source/ts_hostage`. Deze update is niet automatisch
+De repository in de code is `troyscripts/ts_hostage`. Deze update is niet automatisch
 naar GitHub gepubliceerd; publiceer version.json samen met de nieuwe bronbestanden.
 
 De controle installeert de update niet automatisch. Maak een backup en volg
-[Bijwerken naar 1.1.7](#bijwerken-naar-117) om een nieuwe versie handmatig te installeren.
+[Bijwerken naar 1.1.8](#bijwerken-naar-117) om een nieuwe versie handmatig te installeren.
 
 ## Changelog
 
-### 1.1.7 — Bridgecontrole en locales
+### 1.1.8 — Bridgecontrole en locales
 
-- Vereist ts_bridge 0.0.2(BETA), met client/server-controle op versie, API en functies.
+- Vereist ts_bridge 0.0.3, met client/server-controle op versie, API en functies.
 - Veilige opruiming bij bridge-uitval en duidelijke consolemelding.
 - Aanpasbare locales/nl.lua, NL als standaard en fallback.
 - Bestaande gijzelingslogica en GitHub-updatecontrole behouden.
@@ -315,7 +318,7 @@ De controle installeert de update niet automatisch. Maak een backup en volg
 Gijzelen te voet en in voertuigen is eerder door de gebruiker als werkend gemeld.
 De eerdere documentatie vermeldt Lua-syntaxcontroles en tests met gesimuleerde
 FiveM-functies voor versie 1.1.0. Die resultaten zijn geen volledige validatie
-van versie 1.1.7, live animaties of daadwerkelijke Discord-bezorging.
+van versie 1.1.8, live animaties of daadwerkelijke Discord-bezorging.
 
 Test na installatie of bijwerken:
 
@@ -339,3 +342,41 @@ Test na installatie of bijwerken:
 ---
 
 Ontwikkeld door **TroyScripts**.
+
+## Nieuw in 1.1.8: rustige meldingen en radialmenu
+
+E zonder richten blijft te voet stil. In de auto wordt alleen in first person een
+poging gedaan (zolang Config.Vehicle.RequireFirstPerson aanstaat). Tijdens een
+lopende gijzeling hoef je niet te blijven richten; E en X blijven werken.
+Ox_target behoudt de bestaande afstand-, wapen-, gezondheid- en voertuigcontroles.
+
+Gewone meldingen hebben de titel **Gijzeling** en delen één limiet van standaard
+5 seconden. Ook verschillende afwijzingen kunnen daardoor niet stapelen. De limiet
+is `Config.NotificationCooldownMs`. Politiemeldingen hebben hun eigen bestaande
+bridge-afhandeling en worden niet door deze persoonlijke limiet onderdrukt.
+Vertraagde afwijzingen horen bij hun oorspronkelijke poging: een oude reactie wordt
+niet getoond bij een nieuwe poging. Bij een poging via E wordt de afwijzing ook
+verborgen wanneer je niet meer richt; in de auto geldt de cameracontrole.
+Diagnosecommando's blijven bewust aangevraagde controles (details staan altijd in F8).
+
+`Config.Radial.Enabled = true` voegt een submenu toe aan ox_lib met Gijzelen,
+Loslaten en Omleggen. Het menu van ox_lib opent standaard met Z, afhankelijk van
+persoonlijke keybindings. Kies Gijzelen zonder te richten; de normale geschiktheids-
+en voertuigcontroles blijven gelden. Loslaten/omleggen doen niets zonder een eigen
+lopende gijzeling; de bestaande uitvoervertraging blijft actief.
+Bij een ander radialmenu: zet deze optie uit en gebruik client-exports:
+`exports.ts_hostage:TakeHostage()`, `exports.ts_hostage:ReleaseHostage()` en
+`exports.ts_hostage:ExecuteHostage()`. Ze worden alleen vanuit bewuste menuacties aangeroepen.
+Radial-API: https://overextended.dev/docs/ox_lib/Interface/Client/radial
+
+## Configversie
+
+Scriptversie en configversie staan los van elkaar. Voor 1.1.8 is
+`Config.Version = '1.1.8'` vereist. De serverconsole meldt bij starten of de config
+actueel is. Bij volgende releases blijft de vereiste configversie gelijk zolang
+geen nieuwe indeling nodig is. Een oude config blijft met veilige standaardwaarden
+werken, maar meldt dat je moet bijwerken; de versie wordt niet automatisch overschreven.
+Vervang bij deze update config.lua en neem je eigen instellingen over, of voeg alle
+nieuwe velden uit het begin van de meegeleverde config toe en zet daarna de versie.
+server_config.lua heeft geen nieuwe instellingen en hoeft niet vervangen te worden.
+Bewaar eigen webhook-URL's en politie-instellingen.

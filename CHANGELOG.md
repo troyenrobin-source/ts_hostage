@@ -1,5 +1,21 @@
 # Changelog — ts_hostage
 
+## 1.1.8 — Meldingen, radialmenu en configversie
+- GitHub-updatecontrole, downloadlink en documentatie bijgewerkt naar troyscripts/ts_hostage.
+- Sneltoets vereist te voet eerst richten; zonder richten geen poging of melding.
+- Target behoudt bestaande bediening; radialmenu is een bewuste actie zonder richtplicht te voet.
+- Auto: geen startpoging of gewone melding buiten vereiste first person.
+- Globale instelbare meldingswachttijd (standaard 5000 ms), ook voor verschillende fouten.
+- Gewone meldingen krijgen de titel Gijzeling; branding uit spelersteksten en standaard webhookteksten.
+- Mislukte lokale pogingen hebben nu ook request-cooldown.
+- Vertraagde afwijzingen gekoppeld aan poging; oude antwoorden en vervallen context blijven stil.
+- Ox_lib-radial met gijzelen, loslaten en omleggen; client-exports voor andere radialmenu's.
+- Config.Version met startupcontrole en fallback voor ontbrekende nieuwe instellingen.
+- Actieve gijzeling vereist geen blijvend richten; servervalidatie en uitvoervertraging behouden.
+- Bridge-aansluiting bijgewerkt: minimaal ts_bridge 0.0.3; gedeelde meldingslimiet, radialmenu en configversiecontrole. Hostage blijft versie 1.1.8.
+- Config.lua bijwerken: JA. Server_config.lua bijwerken: NEE.
+- Lua 5.4 syntax en mocktests; live FiveM-test nog nodig.
+
 ## 1.1.7 — Bridgecontrole en aanpasbare locales
 - Verplicht ts_bridge 0.0.2(BETA) / API 1; controle op client en server.
 - Ontbrekende functies of oudere bridge blokkeren gameplay met een duidelijke melding.
